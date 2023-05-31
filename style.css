@@ -1,0 +1,10 @@
+body {
+    background-color: #000;
+    color: #fff;
+}
+
+#animated {
+    width: 10rem;
+    height: auto;
+    position: absolute;
+}
