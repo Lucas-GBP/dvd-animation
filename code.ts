@@ -8,6 +8,20 @@ window.addEventListener("resize", () => {
     viewScreen.height = window.innerHeight;
 });
 
+interface configType {
+    dvdQuant:number,
+    randomVelocity:boolean,
+    colisionBetween:boolean,
+    size:number,
+}
+
+const config:configType = {
+    dvdQuant: 10,
+    size: 128,
+    randomVelocity:true,
+    colisionBetween:true,
+}
+
 class colisionObject {
     x:number;
     y:number;
@@ -97,18 +111,28 @@ class colisionObject {
             obj.vy *= -1; 
         }
 
-        if(this.x > obj.x){
-            do{
+        while(this.x < obj.x + obj.width && 
+            this.x + this.width > obj.x && 
+            this.y < obj.y + obj.height && 
+            this.y + this.height > obj.y
+        ){
+
+            if(this.x > obj.x){
                 this.x++;
                 obj.x--;
-            } while(this.x < obj.x + obj.width && this.x + this.width > obj.x);
-        } else {
-            do{
+            } else if(this.x < obj.x){
                 this.x--;
                 obj.x++;
-            } while(this.x < obj.x + obj.width && this.x + this.width > obj.x);
+            }
+        
+            if(this.y > obj.y){
+                this.y++;
+                obj.y--;
+            } else if(this.y < obj.y){
+                this.y--;
+                obj.y++;
+            }
         }
-
         if(this.y > obj.y){
             do{
                 this.y++;
@@ -133,6 +157,7 @@ class DvDObject {
         this.div = document.createElement("div");
         // configurating div
         this.div.className = "animated";
+        this.div.style.width = `${config.size}px`;
 
         // creating svg has a child of div
         this.svg = this.div.appendChild(document.createElementNS('http://www.w3.org/2000/svg', 'svg'))
@@ -144,7 +169,7 @@ class DvDObject {
         // rendering in DOM
         document.body.appendChild(this.div);
 
-        const v = this.randomVelocity();
+        const v = this.genVelocity();
         // properties from the dom
         [this.div.style.left, this.div.style.top] = this.randomPosition();
         this.obj = new colisionObject(
@@ -161,7 +186,7 @@ class DvDObject {
         this.div.style.top = `${this.obj.y}px`;
     }
     changeColor(){
-        //this.svg.setAttribute('fill', this.randomColor());
+        this.svg.setAttribute('fill', this.randomColor());
     }
     invertVelocity(){
         this.obj.vx *= -1;
@@ -178,8 +203,12 @@ class DvDObject {
     randomColor() {
         return `#${Math.floor(Math.random()*10000000+6777215).toString(16)}`;
     }
-    randomVelocity():[number, number] {
-        const v_m = Math.ceil(Math.random()*6)+4;
+    genVelocity():[number, number] {
+        let v_m;
+        if(config.randomVelocity){
+            v_m = Math.ceil(Math.random()*6)+4;
+        }
+        v_m = 5;
         const direction = Math.ceil(Math.random()*4);
         switch (direction){
             case 1:
@@ -235,28 +264,31 @@ class DvDObject {
 }
 
 const dvds:DvDObject[] = [];
-for(let i = 0; i < 2; i++){
+for(let i = 0; i < config.dvdQuant; i++){
     dvds.push(new DvDObject);
 }
 
 const updateDVDs = async () => {
     // Colision System
-    for(let i = 0; i < dvds.length; i++){
-        console.log(dvds[i]);
+    let i;
+
+    for(i = 0; i < dvds.length; i++){
         dvds[i].obj.move();
-        for(let j = 0; j < dvds.length; j++){
-            if(j !== i && dvds[i].obj.isColided(dvds[j].obj)){
-                dvds[i].changeColor();
-                dvds[j].changeColor();
-                dvds[i].obj.boxColision(dvds[j].obj);
+    }
+
+    if(config.colisionBetween){
+        for(i = 0; i < dvds.length; i++){
+            for(let j = 0; j < dvds.length; j++){
+                if(j !== i && dvds[i].obj.isColided(dvds[j].obj)){
+                    dvds[i].changeColor();
+                    dvds[j].changeColor();
+                    dvds[i].obj.boxColision(dvds[j].obj);
+                }
             }
         }
-        if(dvds[i].obj.isBorderColided(viewScreen.width, viewScreen.height)){
-            dvds[i].changeColor();
-            dvds[i].obj.borderColision(viewScreen.width, viewScreen.height);
-        }
     }
-    for(let i = 0; i < dvds.length; i++){
+
+    for(i = 0; i < dvds.length; i++){
         if(dvds[i].obj.isBorderColided(viewScreen.width, viewScreen.height)){
             dvds[i].changeColor();
             dvds[i].obj.borderColision(viewScreen.width, viewScreen.height);
@@ -264,9 +296,9 @@ const updateDVDs = async () => {
     }
 
     // Plot Canvas
-    dvds.map((dvd) => {
-        dvd.setPositionInDom();
-    })
+    for(i = 0; i < dvds.length; i++){
+        dvds[i].setPositionInDom();
+    }
 }
 
 window.setInterval(updateDVDs, 16.67); //60 fps

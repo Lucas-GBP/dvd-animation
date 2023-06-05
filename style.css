@@ -3,8 +3,17 @@ body {
     color: #fff;
 }
 
+#menu {
+    z:2;
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    /*width:25%;*/
+    height:100%;
+    background-color: #ffffff05;
+}
+
 .animated {
-    width: 10rem;
     height: auto;
     position: absolute;
 }
