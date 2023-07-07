@@ -18,8 +18,8 @@ window.addEventListener("resize", () => {
     viewScreen.height = window.innerHeight;
 });
 const config = {
-    dvdQuant: 10,
-    size: 128,
+    dvdQuant: 500,
+    size: 16,
     randomVelocity: true,
     colisionBetween: true,
 };
@@ -60,35 +60,26 @@ class colisionObject {
     }
     borderColision(width, height) {
         if (this.x > width - this.width) {
-            this.x--;
+            this.x = width - this.width;
             this.vx = -Math.abs(this.vx);
         }
-        while (this.x > width - this.width) {
-            this.x--;
-        }
         if (this.x < 0) {
-            this.x++;
+            this.x = 0;
             this.vx = Math.abs(this.vx);
         }
-        while (this.x < 0) {
-            this.x++;
-        }
         if (this.y > height - this.height) {
-            this.y--;
+            this.y = height - this.height;
             this.vy = -Math.abs(this.vy);
         }
-        while (this.y > height - this.height) {
-            this.y--;
-        }
         if (this.y < 0) {
-            this.y++;
+            this.y = 0;
             this.vy = Math.abs(this.vy);
-        }
-        while (this.y < 0) {
-            this.y++;
         }
     }
     boxColision(obj) {
+        //Overlap
+        this.x += (this.x - obj.x) / 2;
+        this.y += (this.y - obj.y) / 2;
         if (Math.sign(obj.vx) + Math.sign(this.vx) === 0) {
             this.vx *= -1;
             obj.vx *= -1;
@@ -97,39 +88,25 @@ class colisionObject {
             this.vy *= -1;
             obj.vy *= -1;
         }
-        while (this.x < obj.x + obj.width &&
+        /*
+        while(this.x < obj.x + obj.width &&
             this.x + this.width > obj.x &&
             this.y < obj.y + obj.height &&
-            this.y + this.height > obj.y) {
-            if (this.x > obj.x) {
-                this.x++;
+            this.y + this.height > obj.y &&
+        ){
+
+            if(this.x > obj.x){
                 obj.x--;
-            }
-            else if (this.x < obj.x) {
-                this.x--;
+            } else if(this.x < obj.x){
                 obj.x++;
             }
-            if (this.y > obj.y) {
-                this.y++;
+        
+            if(this.y > obj.y){
                 obj.y--;
-            }
-            else if (this.y < obj.y) {
-                this.y--;
+            } else if(this.y < obj.y){
                 obj.y++;
             }
-        }
-        if (this.y > obj.y) {
-            do {
-                this.y++;
-                obj.y--;
-            } while (this.y < obj.y + obj.height && this.y + this.height > obj.y);
-        }
-        else {
-            do {
-                this.y--;
-                obj.y++;
-            } while (this.y < obj.y + obj.height && this.y + this.height > obj.y);
-        }
+        }*/
     }
 }
 class DvDObject {
