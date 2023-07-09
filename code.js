@@ -152,11 +152,10 @@ class DvDObject {
         return `#${Math.floor(Math.random() * 10000000 + 6777215).toString(16)}`;
     }
     genVelocity() {
-        let v_m;
+        let v_m = 5;
         if (config.randomVelocity) {
             v_m = Math.ceil(Math.random() * 6) + 4;
         }
-        v_m = 5;
         const direction = Math.ceil(Math.random() * 4);
         switch (direction) {
             case 1:
